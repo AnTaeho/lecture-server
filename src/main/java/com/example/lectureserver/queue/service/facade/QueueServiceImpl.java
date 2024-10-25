@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class QueueServiceImpl implements QueueService {
+
     private final QueueCommandService queueCommandService;
     private final QueueQueryService queueQueryService;
 
