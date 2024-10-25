@@ -20,10 +20,5 @@ spring:
 
 
 jwt:
-  secretKey: j2jk34b12b4jkb1jk4bk1b4j24bjk2b14kj21b4jb21k4b1khvfc8f7gfg7f2g78ab82ng2kj1f2dg1aaf9asf8afgyivfl3fy13f138fku1hfo1bu
-
-  access:
-    expiration: 3600000 # 1??(60?) (1000L(ms -> s) * 60L(s -> m) * 60L(m -> h))
-
-  refresh:
-    expiration: 1209600000 #  (1000L(ms -> s) * 60L(s -> m) * 60L(m -> h) * 24L(h -> ??) * 14(2?))
+  secret: j2jk34b12b4jkb1jk4bk1b4j24bjk2b14kj21b4jb21k4b1khvfc8f7gfg7f2g78ab82ng2kj1f2dg1aaf9asf8afgyivfl3fy13f138fku1hfo1bu
+  queue_expiration_time: 3600 # 1??
