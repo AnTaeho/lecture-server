@@ -1,7 +1,7 @@
 package com.example.lectureserver.ticket.manager;
 
 import com.example.lectureserver.ticket.domain.Ticket;
-import com.example.lectureserver.ticket.dto.TicketRequest;
+import com.example.lectureserver.ticket.controller.dto.TicketRequest;
 import com.example.lectureserver.ticket.repository.TicketRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

@@ -1,6 +1,6 @@
 package com.example.lectureserver.event.ticket;
 
-import com.example.lectureserver.producer.TickerMessageProducer;
+import com.example.lectureserver.kafka.producer.TickerMessageProducer;
 import com.example.lectureserver.ticket.domain.TicketOutbox;
 import com.example.lectureserver.ticket.manager.TicketOutboxManager;
 import lombok.RequiredArgsConstructor;

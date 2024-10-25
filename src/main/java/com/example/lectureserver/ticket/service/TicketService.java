@@ -1,9 +1,9 @@
 package com.example.lectureserver.ticket.service;
 
 import com.example.lectureserver.event.ticket.TicketEvent;
-import com.example.lectureserver.redis.RedisTicketService;
-import com.example.lectureserver.ticket.dto.TicketRequest;
-import com.example.lectureserver.ticket.dto.TicketResponse;
+import com.example.lectureserver.ticket.redis.RedisTicketService;
+import com.example.lectureserver.ticket.controller.dto.TicketRequest;
+import com.example.lectureserver.ticket.controller.dto.TicketResponse;
 import com.example.lectureserver.ticket.manager.TickerCommandManager;
 import com.example.lectureserver.ticket.manager.TicketQueryManager;
 import lombok.RequiredArgsConstructor;

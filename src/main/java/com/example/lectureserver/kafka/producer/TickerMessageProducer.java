@@ -1,4 +1,4 @@
-package com.example.lectureserver.producer;
+package com.example.lectureserver.kafka.producer;
 
 import com.example.lectureserver.event.ticket.TicketEvent;
 import lombok.RequiredArgsConstructor;

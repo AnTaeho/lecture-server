@@ -1,4 +1,4 @@
-package com.example.lectureserver.consumer;
+package com.example.lectureserver.kafka.consumer;
 
 import com.example.lectureserver.event.ticket.TicketEvent;
 import com.example.lectureserver.ticket.domain.Ticket;

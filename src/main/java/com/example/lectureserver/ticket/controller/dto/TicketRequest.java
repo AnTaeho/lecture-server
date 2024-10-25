@@ -1,4 +1,4 @@
-package com.example.lectureserver.ticket.dto;
+package com.example.lectureserver.ticket.controller.dto;
 
 public record TicketRequest(
         Long lectureId,

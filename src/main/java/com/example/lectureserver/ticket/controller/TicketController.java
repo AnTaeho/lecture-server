@@ -1,7 +1,7 @@
 package com.example.lectureserver.ticket.controller;
 
-import com.example.lectureserver.ticket.dto.TicketRequest;
-import com.example.lectureserver.ticket.dto.TicketResponse;
+import com.example.lectureserver.ticket.controller.dto.TicketRequest;
+import com.example.lectureserver.ticket.controller.dto.TicketResponse;
 import com.example.lectureserver.ticket.service.TicketService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
