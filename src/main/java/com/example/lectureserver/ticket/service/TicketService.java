@@ -31,14 +31,20 @@ public class TicketService {
             return;
         }
 
-        int amount = ticketQueryManager.getAmount(ticketId);
-        Long increment = redisTicketService.increment();
-        if (amount < increment) {
+        if (redisTicketService.isNotServed(ticketId)) {
+            int amount = ticketQueryManager.getAmount(ticketId);
+            redisTicketService.setTicketCount(ticketId, amount);
+        }
+
+        Long decrease = redisTicketService.decrease(ticketId);
+
+        if (decrease < 0L) {
+            redisTicketService.increment(ticketId);
             return;
         }
 
         publisher.publishEvent(new TicketEvent(ticketId, email));
     }
-
-
 }
+
+
