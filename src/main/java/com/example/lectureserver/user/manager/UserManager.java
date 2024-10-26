@@ -38,4 +38,9 @@ public class UserManager {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid username or password"));
     }
 
+    public User getUser(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
+    }
+
 }
