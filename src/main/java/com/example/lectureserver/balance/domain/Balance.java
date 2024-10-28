@@ -6,8 +6,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,13 +22,11 @@ public class Balance {
 
     private int amount;
 
-    @OneToOne
-    @JoinColumn(name = "userId")
-    private User user;
+    private Long userId;
 
     public Balance(User user) {
         this.amount = 0;
-        this.user = user;
+        this.userId = user.getId();
     }
 
     public void charge(int amount) {

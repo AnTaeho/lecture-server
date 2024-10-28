@@ -4,11 +4,13 @@ import com.example.lectureserver.user.controller.dto.LoginRequest;
 import com.example.lectureserver.user.controller.dto.UserResponse;
 import com.example.lectureserver.user.controller.dto.JoinRequest;
 import com.example.lectureserver.user.service.UserService;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -26,5 +28,12 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<UserResponse> login(@RequestBody LoginRequest loginRequest) {
         return ResponseEntity.ok(userService.login(loginRequest));
+    }
+
+    @PostMapping("/balance")
+    public ResponseEntity<String> chargeBalance(@RequestParam int amount, @RequestParam String email) {
+//        String email = UUID.randomUUID().toString();
+        userService.chargeBalance(email, amount);
+        return ResponseEntity.ok(email);
     }
 }

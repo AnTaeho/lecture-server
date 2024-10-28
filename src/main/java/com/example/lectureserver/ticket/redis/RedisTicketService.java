@@ -1,5 +1,7 @@
 package com.example.lectureserver.ticket.redis;
 
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -44,5 +46,15 @@ public class RedisTicketService {
 
     private String makeTicketCount(Long ticketId) {
         return TICKET_COUNT + ticketId;
+    }
+
+    public boolean checkUserChargeTrial(String email) {
+        if (redisTemplate.opsForValue().get(email) != null) {
+            return true;
+        }
+
+        redisTemplate.opsForValue().set(email, "LOCK", 10, TimeUnit.SECONDS);
+
+        return false;
     }
 }

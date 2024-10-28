@@ -2,6 +2,7 @@ package com.example.lectureserver.aop;
 
 import com.example.lectureserver.common.annotation.DistributedLock;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +10,8 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
 
 @Aspect
@@ -17,7 +20,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class DistributeLockAspect {
 
-    private final RedisSimpleLock redisSimpleLock;
+    private final RedissonClient redisson;
 
     @Around("@annotation(com.example.lectureserver.common.annotation.DistributedLock)")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -25,22 +28,24 @@ public class DistributeLockAspect {
         Method method = signature.getMethod();
         DistributedLock distributedLock = method.getAnnotation(DistributedLock.class);
 
+        String email = (String) joinPoint.getArgs()[0];
         String lockKey = distributedLock.key();
-        String lockValue = UUID.randomUUID().toString();
 
+        RLock lock = redisson.getLock(lockKey + email);
         try {
-            boolean acquired = redisSimpleLock.tryLock(
-                    lockKey,
-                    lockValue,
+            boolean acquired = lock.tryLock(
+                    distributedLock.waitTime(),
                     distributedLock.leaseTime(),
                     distributedLock.timeUnit()
             );
+            log.info("get lock");
             if (!acquired) {
-                throw new IllegalArgumentException("lock exception");
+                throw new IllegalArgumentException();
             }
             return joinPoint.proceed();
         } finally {
-            redisSimpleLock.releaseLock(lockKey, lockValue);
+            lock.unlock();
+            log.info("lock released");
         }
     }
 
