@@ -3,7 +3,6 @@ package com.example.lectureserver.user.service;
 import com.example.lectureserver.balance.domain.Balance;
 import com.example.lectureserver.balance.manager.BalanceManager;
 import com.example.lectureserver.balance.repository.BalanceRepository;
-import com.example.lectureserver.common.annotation.DistributedLock;
 import com.example.lectureserver.ticket.redis.RedisTicketService;
 import com.example.lectureserver.user.controller.dto.LoginRequest;
 import com.example.lectureserver.user.controller.dto.UserResponse;
@@ -34,13 +33,12 @@ public class UserService {
         return new UserResponse(userManager.login(loginRequest.email(), loginRequest.password()).getId());
     }
 
-    @DistributedLock(key = "charge-balance")
     @Transactional
     public void chargeBalance(String email, int amount) {
-//        boolean isDuplicate = redisTicketService.checkUserChargeTrial(email);
-//        if (isDuplicate) {
-//            return;
-//        }
+        boolean isDuplicate = redisTicketService.checkUserChargeTrial(email);
+        if (isDuplicate) {
+            return;
+        }
 
         User user = userManager.getUser(email);
         balanceManager.charge(user.getId(), amount);

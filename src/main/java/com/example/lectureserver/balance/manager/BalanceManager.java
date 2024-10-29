@@ -17,6 +17,5 @@ public class BalanceManager {
         Balance balance = balanceRepository.findByUserId(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 계좌를 찾을 수 없습니다."));
         balance.charge(amount);
-//        balanceRepository.saveAndFlush(balance);
     }
 }
