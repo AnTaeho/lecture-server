@@ -39,7 +39,7 @@ public class TicketService {
         Long decrease = redisTicketService.decrease(ticketId);
 
         if (decrease < 0L) {
-            redisTicketService.increment(ticketId);
+//            redisTicketService.increment(ticketId);
             return;
         }
 

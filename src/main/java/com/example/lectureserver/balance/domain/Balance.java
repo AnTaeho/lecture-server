@@ -34,6 +34,9 @@ public class Balance {
     }
 
     public void use(int amount) {
+        if (this.amount < amount) {
+            throw new IllegalArgumentException("잔액이 부족합니다.");
+        }
         this.amount -= amount;
     }
 }

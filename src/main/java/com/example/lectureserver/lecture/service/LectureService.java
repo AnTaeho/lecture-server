@@ -1,5 +1,7 @@
 package com.example.lectureserver.lecture.service;
 
+import com.example.lectureserver.balance.domain.Balance;
+import com.example.lectureserver.balance.repository.BalanceRepository;
 import com.example.lectureserver.lecture.controller.dto.LectureDetailResponse;
 import com.example.lectureserver.lecture.controller.dto.LectureListResponse;
 import com.example.lectureserver.lecture.controller.dto.LectureRegisterRequest;
@@ -8,8 +10,9 @@ import com.example.lectureserver.lecture.controller.dto.LectureSimpleResponse;
 import com.example.lectureserver.lecture.controller.dto.ReservationRequest;
 import com.example.lectureserver.lecture.domain.Lecture;
 import com.example.lectureserver.lecture.repository.LectureRepository;
+import com.example.lectureserver.payment.domain.Payment;
+import com.example.lectureserver.payment.repository.PaymentRepository;
 import com.example.lectureserver.reservation.domain.Reservation;
-import com.example.lectureserver.reservation.dto.ReservationResponse;
 import com.example.lectureserver.reservation.repository.ReservationRepository;
 import com.example.lectureserver.seat.domain.Seat;
 import com.example.lectureserver.seat.repository.SeatRepository;
@@ -29,6 +32,8 @@ public class LectureService {
     private final SeatRepository seatRepository;
     private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
+    private final BalanceRepository balanceRepository;
+    private final PaymentRepository paymentRepository;
 
     @Transactional
     public LectureResponse registerLecture(LectureRegisterRequest lectureRegisterRequest) {
@@ -36,7 +41,8 @@ public class LectureService {
                 lectureRegisterRequest.title(),
                 lectureRegisterRequest.description(),
                 lectureRegisterRequest.lecturer(),
-                lectureRegisterRequest.size()
+                lectureRegisterRequest.size(),
+                lectureRegisterRequest.price()
         );
 
         Lecture savedLecture = lectureRepository.save(lecture);
@@ -49,16 +55,30 @@ public class LectureService {
     }
 
     @Transactional
-    public ReservationResponse reserveLecture(String email, Long lectureId, ReservationRequest reservationRequest) {
+    public LectureResponse reserveLecture(String email, Long lectureId, ReservationRequest reservationRequest) {
         Lecture lecture = getLecture(lectureId);
         User user = getUser(email);
 
+        Balance balance = balanceRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("계좌를 찾을 수 없습니다."));
+
+        checkBalance(balance.getAmount(), lecture, reservationRequest.seatNumbers().size());
+
         for (Integer seatNumber : reservationRequest.seatNumbers()) {
+            balance.use(lecture.getPrice());
+            paymentRepository.save(new Payment(lecture.getPrice(), user.getId(), lecture.getId(), seatNumber));
+
             Reservation reservation = new Reservation(user.getEmail(), lecture.getId(), seatNumber);
             reservationRepository.save(reservation);
         }
 
-        return new ReservationResponse(1L);
+        return new LectureResponse(lectureId);
+    }
+
+    private void checkBalance(int amount, Lecture lecture, int size) {
+        if (amount < lecture.getPrice() * size) {
+            throw new IllegalArgumentException("잔액이 부족합니다.");
+        }
     }
 
     public LectureListResponse getALlLecture() {

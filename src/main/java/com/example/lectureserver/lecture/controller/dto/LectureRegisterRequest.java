@@ -4,6 +4,7 @@ public record LectureRegisterRequest(
         String title,
         String description,
         String lecturer,
-        int size
+        int size,
+        int price
 ) {
 }

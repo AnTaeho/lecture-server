@@ -29,15 +29,17 @@ public class Lecture {
     private String lecturer;
 
     private int size;
+    private int price;
 
     @OneToMany(mappedBy = "lecture", cascade = CascadeType.REMOVE)
     private final List<Seat> seats = new ArrayList<>();
 
-    public Lecture(String title, String description, String lecturer, int size) {
+    public Lecture(String title, String description, String lecturer, int size, int price) {
         this.title = title;
         this.description = description;
         this.lecturer = lecturer;
         this.size = size;
+        this.price = price;
     }
 
     public void addSeat(Seat seat) {
