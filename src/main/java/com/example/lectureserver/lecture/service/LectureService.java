@@ -1,5 +1,6 @@
 package com.example.lectureserver.lecture.service;
 
+import com.example.lectureserver.aop.seatLock.SeatLock;
 import com.example.lectureserver.balance.domain.Balance;
 import com.example.lectureserver.balance.repository.BalanceRepository;
 import com.example.lectureserver.lecture.controller.dto.LectureDetailResponse;
@@ -54,17 +55,18 @@ public class LectureService {
         return new LectureResponse(savedLecture.getId());
     }
 
+    @SeatLock
     @Transactional
-    public LectureResponse reserveLecture(String email, Long lectureId, ReservationRequest reservationRequest) {
+    public LectureResponse reserveLecture(ReservationRequest request, String email, Long lectureId) {
         Lecture lecture = getLecture(lectureId);
         User user = getUser(email);
 
         Balance balance = balanceRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("계좌를 찾을 수 없습니다."));
 
-        checkBalance(balance.getAmount(), lecture, reservationRequest.seatNumbers().size());
+        checkBalance(balance.getAmount(), lecture, request.seatNumbers().size());
 
-        for (Integer seatNumber : reservationRequest.seatNumbers()) {
+        for (Integer seatNumber : request.seatNumbers()) {
             balance.use(lecture.getPrice());
             paymentRepository.save(new Payment(lecture.getPrice(), user.getId(), lecture.getId(), seatNumber));
 
