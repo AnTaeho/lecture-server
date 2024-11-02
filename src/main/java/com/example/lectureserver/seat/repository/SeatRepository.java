@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface SeatRepository extends JpaRepository<Seat, Long> {
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Lock(LockModeType.PESSIMISTIC_READ)
     @Query("select s from Seat s where s.lecture.id = :lectureId and s.seatNumber = :seatNumber and s.status = 'AVAILABLE'")
     Optional<Seat> findSeatWithPessimisticLock(@Param("lectureId") Long lectureId, @Param("seatNumber") int seatNumber);
 

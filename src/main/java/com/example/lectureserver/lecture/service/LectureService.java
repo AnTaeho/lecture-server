@@ -1,5 +1,6 @@
 package com.example.lectureserver.lecture.service;
 
+import com.example.lectureserver.aop.lock.DistributedLock;
 import com.example.lectureserver.balance.domain.Balance;
 import com.example.lectureserver.balance.repository.BalanceRepository;
 import com.example.lectureserver.lecture.controller.dto.LectureDetailResponse;
@@ -54,6 +55,7 @@ public class LectureService {
         return new LectureResponse(savedLecture.getId());
     }
 
+    @DistributedLock(key = "LECTURE_LOCK")
     @Transactional
     public LectureResponse reserveLecture(ReservationRequest request, String email, Long lectureId) {
         Lecture lecture = getLecture(lectureId);
