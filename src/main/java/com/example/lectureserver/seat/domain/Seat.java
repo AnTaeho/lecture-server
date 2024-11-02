@@ -3,6 +3,8 @@ package com.example.lectureserver.seat.domain;
 import com.example.lectureserver.lecture.domain.Lecture;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,6 +27,9 @@ public class Seat {
 
     private int seatNumber;
 
+    @Enumerated(EnumType.STRING)
+    private SeatStatus status;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lecture_id")
     private Lecture lecture;
@@ -32,6 +37,11 @@ public class Seat {
     public Seat(int seatNumber, Lecture lecture) {
         this.seatNumber = seatNumber;
         this.lecture = lecture;
+        this.status = SeatStatus.AVAILABLE;
         lecture.addSeat(this);
+    }
+
+    public void updateStatus() {
+        this.status = SeatStatus.UNAVAILABLE;
     }
 }
