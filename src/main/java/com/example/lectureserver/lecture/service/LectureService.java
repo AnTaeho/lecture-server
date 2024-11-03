@@ -12,8 +12,7 @@ import com.example.lectureserver.lecture.domain.Lecture;
 import com.example.lectureserver.lecture.repository.LectureRepository;
 import com.example.lectureserver.payment.dto.PaymentResult;
 import com.example.lectureserver.payment.service.PaymentService;
-import com.example.lectureserver.reservation.domain.Reservation;
-import com.example.lectureserver.reservation.repository.ReservationRepository;
+import com.example.lectureserver.reservation.service.ReservationService;
 import com.example.lectureserver.seat.domain.Seat;
 import com.example.lectureserver.seat.repository.SeatRepository;
 import com.example.lectureserver.user.domain.User;
@@ -30,10 +29,10 @@ public class LectureService {
 
     private final LectureRepository lectureRepository;
     private final SeatRepository seatRepository;
-    private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
 
     private final PaymentService paymentService;
+    private final ReservationService reservationService;
 
     @Transactional
     public LectureResponse registerLecture(LectureRegisterRequest lectureRegisterRequest) {
@@ -55,21 +54,13 @@ public class LectureService {
     }
 
     @DistributedLock(key = "'LECTURE_LOCK_' + #lectureId")
-    @Transactional
     public ReservationResult reserveLecture(ReservationRequest request, String email, Long lectureId) {
         Lecture lecture = getLecture(lectureId);
         User user = getUser(email);
 
         PaymentResult paymentResult = paymentService.payPrice(user.getId(), lecture, request.seatNumbers());
 
-        List<Seat> seatWithPessimisticLock = seatRepository.findSeatWithPessimisticLock(lectureId,
-                request.seatNumbers());
-        for (Seat seat : seatWithPessimisticLock) {
-            seat.updateStatus();
-
-            Reservation reservation = new Reservation(email, lectureId, seat.getSeatNumber());
-            reservationRepository.save(reservation);
-        }
+        reservationService.reserveSeat(email, lectureId, request.seatNumbers());
 
         return new ReservationResult(paymentResult.totalPrice(), lectureId);
     }
