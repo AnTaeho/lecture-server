@@ -21,13 +21,11 @@ public class Payment {
 
     private int totalPrice;
     private Long userId;
-    private Long reservationId;
-    private int seatNumber;
+    private Long lectureId;
 
-    public Payment(int totalPrice, Long userId, Long reservationId, int seatNumber) {
+    public Payment(int totalPrice, Long userId, Long lectureId) {
         this.totalPrice = totalPrice;
         this.userId = userId;
-        this.reservationId = reservationId;
-        this.seatNumber = seatNumber;
+        this.lectureId = lectureId;
     }
 }

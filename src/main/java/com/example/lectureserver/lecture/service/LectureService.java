@@ -1,18 +1,17 @@
 package com.example.lectureserver.lecture.service;
 
 import com.example.lectureserver.aop.lock.DistributedLock;
-import com.example.lectureserver.balance.domain.Balance;
-import com.example.lectureserver.balance.repository.BalanceRepository;
 import com.example.lectureserver.lecture.controller.dto.LectureDetailResponse;
 import com.example.lectureserver.lecture.controller.dto.LectureListResponse;
 import com.example.lectureserver.lecture.controller.dto.LectureRegisterRequest;
 import com.example.lectureserver.lecture.controller.dto.LectureResponse;
 import com.example.lectureserver.lecture.controller.dto.LectureSimpleResponse;
 import com.example.lectureserver.lecture.controller.dto.ReservationRequest;
+import com.example.lectureserver.lecture.controller.dto.ReservationResult;
 import com.example.lectureserver.lecture.domain.Lecture;
 import com.example.lectureserver.lecture.repository.LectureRepository;
-import com.example.lectureserver.payment.domain.Payment;
-import com.example.lectureserver.payment.repository.PaymentRepository;
+import com.example.lectureserver.payment.dto.PaymentResult;
+import com.example.lectureserver.payment.service.PaymentService;
 import com.example.lectureserver.reservation.domain.Reservation;
 import com.example.lectureserver.reservation.repository.ReservationRepository;
 import com.example.lectureserver.seat.domain.Seat;
@@ -33,8 +32,8 @@ public class LectureService {
     private final SeatRepository seatRepository;
     private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
-    private final BalanceRepository balanceRepository;
-    private final PaymentRepository paymentRepository;
+
+    private final PaymentService paymentService;
 
     @Transactional
     public LectureResponse registerLecture(LectureRegisterRequest lectureRegisterRequest) {
@@ -55,36 +54,24 @@ public class LectureService {
         return new LectureResponse(savedLecture.getId());
     }
 
-    @DistributedLock(key = "LECTURE_LOCK")
+    @DistributedLock(key = "'LECTURE_LOCK_' + #lectureId")
     @Transactional
-    public LectureResponse reserveLecture(ReservationRequest request, String email, Long lectureId) {
+    public ReservationResult reserveLecture(ReservationRequest request, String email, Long lectureId) {
         Lecture lecture = getLecture(lectureId);
         User user = getUser(email);
 
-        Balance balance = balanceRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new IllegalArgumentException("계좌를 찾을 수 없습니다."));
+        PaymentResult paymentResult = paymentService.payPrice(user.getId(), lecture, request.seatNumbers());
 
-        checkBalance(balance.getAmount(), lecture, request.seatNumbers().size());
-
-        for (Integer seatNumber : request.seatNumbers()) {
-            Seat seat = seatRepository.findSeatWithPessimisticLock(lectureId, seatNumber)
-                    .orElseThrow(() -> new IllegalArgumentException("좌석을 찾을 수 없습니다."));
+        List<Seat> seatWithPessimisticLock = seatRepository.findSeatWithPessimisticLock(lectureId,
+                request.seatNumbers());
+        for (Seat seat : seatWithPessimisticLock) {
             seat.updateStatus();
 
-            balance.use(lecture.getPrice());
-            paymentRepository.save(new Payment(lecture.getPrice(), user.getId(), lecture.getId(), seatNumber));
-
-            Reservation reservation = new Reservation(user.getEmail(), lecture.getId(), seatNumber);
+            Reservation reservation = new Reservation(email, lectureId, seat.getSeatNumber());
             reservationRepository.save(reservation);
         }
 
-        return new LectureResponse(lectureId);
-    }
-
-    private void checkBalance(int amount, Lecture lecture, int size) {
-        if (amount < lecture.getPrice() * size) {
-            throw new IllegalArgumentException("잔액이 부족합니다.");
-        }
+        return new ReservationResult(paymentResult.totalPrice(), lectureId);
     }
 
     public LectureListResponse getALlLecture() {
