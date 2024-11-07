@@ -17,8 +17,8 @@ public interface TicketOutboxRepository extends JpaRepository<TicketOutbox, Long
             @Param("email") String email
     );
 
-    @Query("select tob from TicketOutbox tob where tob.status = 'PUBLISHED'")
-    List<TicketOutbox> findAllPublished();
+    @Query("select tob from TicketOutbox tob where tob.status = 'CREATED'")
+    List<TicketOutbox> findAllNotSendingMessage();
 
     @Query("select tob.id from TicketOutbox tob where tob.createdDate < :oneHourAgo and tob.status = 'DONE'")
     List<Long> findOutboxOneHourAgo(@Param("oneHourAgo") LocalDateTime oneHourAgo);

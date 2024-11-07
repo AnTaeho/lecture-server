@@ -30,7 +30,7 @@ public class TicketOutbox extends BaseEntity {
     public TicketOutbox(Long ticketId, String email) {
         this.ticketId = ticketId;
         this.email = email;
-        this.status = OutboxStatus.PUBLISHED;
+        this.status = OutboxStatus.CREATED;
     }
 
     public void done() {

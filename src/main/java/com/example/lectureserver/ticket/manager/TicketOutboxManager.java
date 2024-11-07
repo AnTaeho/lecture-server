@@ -20,7 +20,7 @@ public class TicketOutboxManager {
     }
 
     public List<TicketOutbox> findAllPublished() {
-        return ticketOutboxRepository.findAllPublished();
+        return ticketOutboxRepository.findAllNotSendingMessage();
     }
 
     public List<Long> findOutboxOneHourAgo(LocalDateTime oneHourAgo) {
