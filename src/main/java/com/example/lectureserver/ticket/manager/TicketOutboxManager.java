@@ -1,5 +1,6 @@
 package com.example.lectureserver.ticket.manager;
 
+import com.example.lectureserver.event.ticket.TicketEvent;
 import com.example.lectureserver.ticket.domain.TicketOutbox;
 import com.example.lectureserver.ticket.repository.TicketOutboxRepository;
 import java.time.LocalDateTime;
@@ -19,8 +20,12 @@ public class TicketOutboxManager {
         ticketOutboxRepository.save(ticketOutbox);
     }
 
-    public List<TicketOutbox> findAllPublished() {
+    public List<TicketOutbox> findAllCreated() {
         return ticketOutboxRepository.findAllNotSendingMessage();
+    }
+
+    public List<TicketOutbox> findAllPublished() {
+        return ticketOutboxRepository.findAllPublished();
     }
 
     public List<Long> findOutboxOneHourAgo(LocalDateTime oneHourAgo) {
@@ -29,5 +34,9 @@ public class TicketOutboxManager {
 
     public void deleteAllIn(List<Long> outboxOneHourAgo) {
         ticketOutboxRepository.deleteAllIn(outboxOneHourAgo);
+    }
+
+    public void updateOutboxStatus(TicketEvent ticketEvent) {
+        ticketOutboxRepository.updateToPublished(ticketEvent.ticketId(), ticketEvent.email());
     }
 }

@@ -22,3 +22,5 @@ spring:
 jwt:
   secret: j2jk34b12b4jkb1jk4bk1b4j24bjk2b14kj21b4jb21k4b1khvfc8f7gfg7f2g78ab82ng2kj1f2dg1aaf9asf8afgyivfl3fy13f138fku1hfo1bu
   queue_expiration_time: 3600 # 1??
+server:
+  port: 8081

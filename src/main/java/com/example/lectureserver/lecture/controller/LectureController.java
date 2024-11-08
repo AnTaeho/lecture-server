@@ -5,6 +5,7 @@ import com.example.lectureserver.lecture.controller.dto.LectureListResponse;
 import com.example.lectureserver.lecture.controller.dto.LectureRegisterRequest;
 import com.example.lectureserver.lecture.controller.dto.LectureResponse;
 import com.example.lectureserver.lecture.controller.dto.ReservationRequest;
+import com.example.lectureserver.lecture.controller.dto.ReservationResult;
 import com.example.lectureserver.lecture.service.LectureService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +30,8 @@ public class LectureController {
     }
 
     @PostMapping("/{lectureId}")
-    public ResponseEntity<LectureResponse> reserveLecture(@PathVariable Long lectureId,
-                                                              @RequestBody ReservationRequest request) {
+    public ResponseEntity<ReservationResult> reserveLecture(@PathVariable Long lectureId,
+                                                            @RequestBody ReservationRequest request) {
         String email = UUID.randomUUID().toString();
         return ResponseEntity.ok(lectureService.reserveLecture(request, email, lectureId));
     }

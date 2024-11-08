@@ -27,10 +27,12 @@ public class Ticket {
         this.lectureId = lectureId;
     }
 
-    public void issue() {
+    public boolean issue() {
         if (amount <= 0) {
-            throw new IllegalArgumentException("Amount must be greater than 0");
+            return true;
+//            throw new IllegalArgumentException("Amount must be greater than 0");
         }
         this.amount -= 1;
+        return false;
     }
 }

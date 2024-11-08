@@ -26,4 +26,11 @@ public interface TicketOutboxRepository extends JpaRepository<TicketOutbox, Long
     @Modifying
     @Query("delete TicketOutbox tob where tob.id in :outboxOneHourAgo")
     void deleteAllIn(@Param("outboxOneHourAgo") List<Long> outboxOneHourAgo);
+
+    @Modifying
+    @Query("update TicketOutbox tob set tob.status = 'PUBLISHED' where tob.ticketId = :ticketId and tob.email = :email")
+    void updateToPublished(@Param("ticketId") Long ticketId, @Param("email") String email);
+
+    @Query("select tob from TicketOutbox tob where tob.status = 'PUBLISHED'")
+    List<TicketOutbox> findAllPublished();
 }

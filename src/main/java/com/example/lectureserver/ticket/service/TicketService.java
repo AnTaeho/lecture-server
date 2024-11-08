@@ -1,11 +1,14 @@
 package com.example.lectureserver.ticket.service;
 
 import com.example.lectureserver.event.ticket.TicketEvent;
+import com.example.lectureserver.ticket.domain.Ticket;
+import com.example.lectureserver.ticket.domain.UserTicket;
 import com.example.lectureserver.ticket.redis.RedisTicketService;
 import com.example.lectureserver.ticket.controller.dto.TicketRequest;
 import com.example.lectureserver.ticket.controller.dto.TicketResponse;
 import com.example.lectureserver.ticket.manager.TickerCommandManager;
 import com.example.lectureserver.ticket.manager.TicketQueryManager;
+import com.example.lectureserver.ticket.repository.UserTicketRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,8 @@ public class TicketService {
     private final TickerCommandManager tickerCommandManager;
     private final RedisTicketService redisTicketService;
     private final ApplicationEventPublisher publisher;
+
+    private final UserTicketRepository userTicketRepository;
 
     public TicketResponse createTicket(TicketRequest ticketRequest) {
         return new TicketResponse(tickerCommandManager.createTicket(ticketRequest).getId());
@@ -42,8 +47,23 @@ public class TicketService {
 //            redisTicketService.increment(ticketId);
             return;
         }
-
+        System.out.println("decrease = " + decrease);
         publisher.publishEvent(new TicketEvent(ticketId, email));
+    }
+
+    @Transactional
+    public void issueTicket2(Long ticketId, String email) {
+
+        if (userTicketRepository.existsByEmailAndTicketId(email, ticketId)) {
+            return;
+        }
+
+        Ticket ticket = ticketQueryManager.getTicket(ticketId);
+
+        if (ticket.issue()) {
+            return;
+        }
+        userTicketRepository.save(new UserTicket(ticketId, email));
     }
 }
 

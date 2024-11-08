@@ -29,7 +29,7 @@ public class TicketEventListener {
     public void produceMessage(TicketEvent ticketEvent) {
         log.info("Produce message");
         tickerMessageProducer.create(ticketEvent);
-//        ticketOutboxManager.updateOutboxStatus(ticketEvent.);
+//        ticketOutboxManager.updateOutboxStatus(ticketEvent);
     }
 
 }

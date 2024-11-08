@@ -4,4 +4,7 @@ import com.example.lectureserver.ticket.domain.UserTicket;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserTicketRepository extends JpaRepository<UserTicket, Long> {
+
+    boolean existsByEmailAndTicketId(String email, Long ticketId);
+
 }

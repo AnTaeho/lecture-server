@@ -18,13 +18,19 @@ public class TicketScheduler {
     private final TickerMessageProducer tickerMessageProducer;
 
     @Scheduled(fixedRate = 300000)
-    public void retryFailedMessage() {
-        List<TicketOutbox> allPublished = ticketOutboxManager.findAllPublished();
+    public void resendFailedMessage() {
+        List<TicketOutbox> allPublished = ticketOutboxManager.findAllCreated();
         for (TicketOutbox ticketOutbox : allPublished) {
             tickerMessageProducer.create(
                     new TicketEvent(ticketOutbox.getTicketId(), ticketOutbox.getEmail())
             );
         }
+    }
+
+    @Scheduled(fixedRate = 300000)
+    public void retryFailMessage() {
+        List<TicketOutbox> allPublished = ticketOutboxManager.findAllPublished();
+
     }
 
     @Scheduled(fixedRate = 3600000)
