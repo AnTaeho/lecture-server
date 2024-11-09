@@ -57,4 +57,13 @@ public class RedisTicketService {
 
         return false;
     }
+
+    public Long getAmount(Long ticketId) {
+        String result = redisTemplate.opsForValue()
+                .get("ticketId:" + ticketId);
+        if (result == null) {
+            return null;
+        }
+        return Long.parseLong(result);
+    }
 }

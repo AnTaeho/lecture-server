@@ -1,6 +1,8 @@
 package com.example.lectureserver.ticket.service;
 
 import com.example.lectureserver.event.ticket.TicketEvent;
+import com.example.lectureserver.ticket.controller.dto.RedisResult;
+import com.example.lectureserver.ticket.controller.dto.RedisVO;
 import com.example.lectureserver.ticket.domain.Ticket;
 import com.example.lectureserver.ticket.domain.TicketOutbox;
 import com.example.lectureserver.ticket.domain.UserTicket;
@@ -10,7 +12,9 @@ import com.example.lectureserver.ticket.controller.dto.TicketRequest;
 import com.example.lectureserver.ticket.controller.dto.TicketResponse;
 import com.example.lectureserver.ticket.manager.TickerCommandManager;
 import com.example.lectureserver.ticket.manager.TicketQueryManager;
+import com.example.lectureserver.ticket.repository.TicketRedisRepository;
 import com.example.lectureserver.ticket.repository.UserTicketRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -24,7 +28,7 @@ public class TicketService {
     private final TickerCommandManager tickerCommandManager;
     private final RedisTicketService redisTicketService;
     private final ApplicationEventPublisher publisher;
-    private final TicketOutboxManager ticketOutboxManager;
+    private final TicketRedisRepository ticketRedisRepository;
 
     private final UserTicketRepository userTicketRepository;
 
@@ -50,7 +54,27 @@ public class TicketService {
             return;
         }
 
-        System.out.println("decrease = " + (1000 - decrease));
+        System.out.println("size = " + (1000 - decrease));
+        publisher.publishEvent(new TicketEvent(ticketId, email));
+    }
+
+    @Transactional
+    public void issueTicketWithRedisTransaction(Long ticketId, String email) {
+        Long amount = redisTicketService.getAmount(ticketId);
+        if (amount == null) {
+            amount = (long) ticketQueryManager.getAmount(ticketId);
+        }
+
+        RedisResult result = ticketRedisRepository.execute(new RedisVO("ticket:" + ticketId, email));
+
+        if (result.size() >= amount) {
+            return;
+        }
+
+        if (result.alreadyIn()) {
+            return;
+        }
+
         publisher.publishEvent(new TicketEvent(ticketId, email));
     }
 
