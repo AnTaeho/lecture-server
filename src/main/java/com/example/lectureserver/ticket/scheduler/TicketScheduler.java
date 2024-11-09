@@ -17,7 +17,7 @@ public class TicketScheduler {
     private final TicketOutboxManager ticketOutboxManager;
     private final TickerMessageProducer tickerMessageProducer;
 
-    @Scheduled(fixedRate = 300000)
+    @Scheduled(fixedRate = 600000)
     public void resendFailedMessage() {
         List<TicketOutbox> allPublished = ticketOutboxManager.findAllCreated();
         for (TicketOutbox ticketOutbox : allPublished) {
@@ -27,11 +27,11 @@ public class TicketScheduler {
         }
     }
 
-    @Scheduled(fixedRate = 300000)
-    public void retryFailMessage() {
-        List<TicketOutbox> allPublished = ticketOutboxManager.findAllPublished();
-
-    }
+//    @Scheduled(fixedRate = 300000)
+//    public void retryFailMessage() {
+//        List<TicketOutbox> allPublished = ticketOutboxManager.findAllPublished();
+//
+//    }
 
     @Scheduled(fixedRate = 3600000)
     public void deleteOldMessage() {

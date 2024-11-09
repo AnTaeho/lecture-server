@@ -21,7 +21,8 @@ public class TicketOutboxManager {
     }
 
     public List<TicketOutbox> findAllCreated() {
-        return ticketOutboxRepository.findAllNotSendingMessage();
+        LocalDateTime fiveMinuteAgo = LocalDateTime.now().minusMinutes(10);
+        return ticketOutboxRepository.findAllNotSendingMessage(fiveMinuteAgo);
     }
 
     public List<TicketOutbox> findAllPublished() {

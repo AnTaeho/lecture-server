@@ -2,7 +2,9 @@ package com.example.lectureserver.ticket.service;
 
 import com.example.lectureserver.event.ticket.TicketEvent;
 import com.example.lectureserver.ticket.domain.Ticket;
+import com.example.lectureserver.ticket.domain.TicketOutbox;
 import com.example.lectureserver.ticket.domain.UserTicket;
+import com.example.lectureserver.ticket.manager.TicketOutboxManager;
 import com.example.lectureserver.ticket.redis.RedisTicketService;
 import com.example.lectureserver.ticket.controller.dto.TicketRequest;
 import com.example.lectureserver.ticket.controller.dto.TicketResponse;
@@ -22,6 +24,7 @@ public class TicketService {
     private final TickerCommandManager tickerCommandManager;
     private final RedisTicketService redisTicketService;
     private final ApplicationEventPublisher publisher;
+    private final TicketOutboxManager ticketOutboxManager;
 
     private final UserTicketRepository userTicketRepository;
 
@@ -44,10 +47,10 @@ public class TicketService {
         Long decrease = redisTicketService.decrease(ticketId);
 
         if (decrease < 0L) {
-//            redisTicketService.increment(ticketId);
             return;
         }
-        System.out.println("decrease = " + decrease);
+
+        System.out.println("decrease = " + (1000 - decrease));
         publisher.publishEvent(new TicketEvent(ticketId, email));
     }
 

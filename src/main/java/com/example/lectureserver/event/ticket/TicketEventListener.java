@@ -20,14 +20,14 @@ public class TicketEventListener {
 
     @TransactionalEventListener(value = TicketEvent.class, phase = TransactionPhase.BEFORE_COMMIT)
     public void saveOutboxInfo(TicketEvent ticketEvent) {
-        log.info("Save outbox info");
+//        log.info("Save outbox info");
         ticketOutboxManager.save(new TicketOutbox(ticketEvent.ticketId(), ticketEvent.email()));
     }
 
     @Async
     @TransactionalEventListener(value = TicketEvent.class, phase = TransactionPhase.AFTER_COMMIT)
     public void produceMessage(TicketEvent ticketEvent) {
-        log.info("Produce message");
+//        log.info("Produce message");
         tickerMessageProducer.create(ticketEvent);
 //        ticketOutboxManager.updateOutboxStatus(ticketEvent);
     }

@@ -25,7 +25,6 @@ public class CouponCreateConsumer {
     @Transactional
     @KafkaListener(topics = "issue-ticket", groupId = "group_1")
     public void listener(TicketEvent ticketEvent) {
-        log.info("ticketId = {} email = {}", ticketEvent.ticketId(), ticketEvent.email());
         userTicketRepository.save(new UserTicket(ticketEvent.ticketId(), ticketEvent.email()));
         decreaseTicketAmount(ticketEvent);
         updateOutboxStatus(ticketEvent);
